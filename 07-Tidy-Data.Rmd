@@ -1,0 +1,232 @@
+---
+title: "Tidy Data"
+author: "Bastola"
+date: "`r format(Sys.Date(), ' %B %d %Y')`"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      collapse = TRUE, 
+                      comment=NA, 
+                      warning = FALSE,
+                      message = FALSE,
+                      fig.height = 4, fig.width = 6, fig.align='center')
+
+
+library(ggplot2)
+library(ggthemes)
+library(dplyr)
+library(tibble)
+library(purrr) 
+library(tidyverse) 
+library(janitor)
+library(lubridate)
+library(tidyr)
+```
+
+
+## Your Turn 1
+
+The following code creates the dataset used in this exercise. 
+
+```{r}
+BP_wide <- tibble(id = letters[1:4],
+                     sex = c("F", "M", "M", "F"),
+                     SBP_v1 = c(130, 120, 130, 119),
+                     SBP_v2 = c(110, 116, 136, 106),
+                     SBP_v3 = c(112, 122, 138, 118))
+BP_wide
+```
+
+### a. What do you think the data in the table are measures of? How can we tell the data are wide?
+
+*Answer:*  
+
+
+### b. What would a long data look like? How many columns will it have?
+
+*Answer:* 
+
+
+----------------------------------------
+
+Your Turn 2
+
+```{r}
+DBP_wide <- tibble(id = letters[1:4],
+ sex = c("F", "M", "M", "F"),
+ v1.DBP = c(88, 84, 102, 70),
+ v2.DBP = c(78, 78, 96, 76),
+ v3.DBP = c(94, 82, 94, 74),
+ age=c(23, 56, 41, 38)
+ )
+DBP_wide
+
+```
+
+
+```{r}
+BP_long <- BP_wide %>% 
+  gather(key = "visit", value = "SBP", SBP_v1:SBP_v3)
+BP_long2 <- BP_long %>% 
+  mutate(visit = str_replace(visit,"SBP_v",""))
+BP_long2
+```
+
+
+### a. Make `DBP_wide` into a long dataframe based on the repeated DBP columns and save it as `DBP_long`
+
+```{r, eval=FALSE}
+DBP_long <- DBP_wide %>%
+  gather(key = _____", value = _____, _______)
+DBP_long
+```
+
+
+```{r}
+DBP_long <- DBP_wide %>%
+  pivot_longer(names_to = _____,
+               values_to = ______,
+               cols = ______)
+DBP_long
+```
+
+
+### b. Clean up the visit column of `DBP_long` so that the values are 1, 2, 3, and save it as `DBP_long`
+
+```{r}
+DBP_long <- DBP_long %>%
+  mutate(visit = str_replace(_________)) %>%
+  mutate(visit = str_replace(_________))  
+DBP_long
+```
+
+
+### c. Make `DBP_long` wide with column names visit.1, visit.2, visit.3 for the DBP values, and save it as `DBP_wide2`
+
+```{r, eval=FALSE}
+DBP_wide2 <- DBP_long %>% 
+  spread(key = _____, value = _____, sep=".") # specify separating character
+DBP_wide2
+```
+
+
+```{r}
+DBP_wide2 <- DBP_long %>% 
+  pivot_wider(names_from = ____,
+              values_from = ____)
+DBP_wide2
+```
+
+
+### d. Join `DBP_long` with `BP_long2` so that we have one data frame with columns id, sex, visit,
+SBP, DBP, and age. Save this as `BP_both_long`.
+
+
+```{r}
+BP_both_long <- left_join(______, ______, by = c(________________))
+BP_both_long
+```
+
+---------------------------------------------
+
+
+# Your Turn 3
+
+```{r, echo=FALSE}
+messy_data <- tibble(NAME = c("J N","A C","D E"), 
+                     `months follow up` = c("", 10, 11), 
+                     `Date of visit` = c("July 31, 2003", "Nov 12, 2005", "Aug 3, 2007"))
+
+```
+
+
+
+### a. Clean column names with clean_names(). Store the clean data under `clean_data`.
+
+```{r}
+clean_data <- _________ %>% 
+  clean_names()
+clean_data
+```
+
+
+### b. Replace missing ("") data in months_follow_up with NA.
+
+```{r}
+clean_data <- messy_data %>% 
+  clean_names() %>%
+  mutate(
+    months_follow_up = replace_na(________________))
+clean_data
+```
+
+
+
+### c. Convert months_follow_up to a numeric variable.
+
+
+```{r}
+clean_data <- messy_data %>% 
+  clean_names() %>%
+  mutate(
+    months_follow_up = replace_na(_____________),
+    months_follow_up = as.numeric(_____________))
+clean_data
+```
+
+
+### d. Convert date_of_visit to a date.
+
+```{r}
+clean_data <- messy_data %>% 
+  clean_names() %>%
+  mutate(
+    months_follow_up = replace_na(_____________),
+    months_follow_up = as.numeric(_____________),
+    date_of_visit = mdy(____________))
+clean_data
+
+```
+
+
+### e. Create a column called date_last_visit that is the date of visit plus months of follow up.
+
+
+```{r}
+clean_data <- messy_data %>% 
+  clean_names() %>%
+  mutate(
+    months_follow_up = replace_na(_____________),
+    months_follow_up = as.numeric(______________),
+    date_of_visit = mdy(____________),
+    date_last_visit = __________ + ______________)
+clean_data
+```
+
+
+
+### f. Remove rows (cases) with missing data in months_follow_up.
+
+```{r}
+clean_data <- clean_data %>%
+  drop_na(______________)
+clean_data
+```
+
+
+
+### g. Remove the spaces in name.
+
+```{r}
+clean_data <- clean_data %>%
+  drop_na(_____________) %>%
+  mutate(name = __________________)
+clean_data
+```
+
+
